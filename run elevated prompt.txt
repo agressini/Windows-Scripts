@@ -1,0 +1,2 @@
+runas /username:admin cmd
+Start-Process powershell -Verb RunAs

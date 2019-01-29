@@ -1,0 +1,1 @@
+New-ExchangeCertificate -GenerateRequest -RequestFile ".\woodgrovebank.req" -SubjectName "c=US,o=Woodgrove Bank,cn=mail.woodgrovebank.com" -DomainName autodiscover.woodgrovebank.com,mail.fabrikam.com,autodiscover.fabrikam.com

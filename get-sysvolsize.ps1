@@ -1,0 +1,1 @@
+﻿"{0:N2} MB" -f ((Get-ChildItem C:\Windows\SYSVOL -Recurse | Measure-Object -Property Length -Sum -ErrorAction Stop).Sum / 1MB) | Out-File -FilePath "$env:USERPROFILE\Desktop\Sysvol_size.txt"

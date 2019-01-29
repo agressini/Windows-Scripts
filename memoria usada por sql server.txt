@@ -1,0 +1,37 @@
+ 
+SELECT  
+(physical_memory_in_use_kb/1024) AS Memory_usedby_Sqlserver_MB,  
+(locked_page_allocations_kb/1024) AS Locked_pages_used_Sqlserver_MB,  
+(total_virtual_address_space_kb/1024) AS Total_VAS_in_MB,  
+process_physical_memory_low,  
+process_virtual_memory_low  
+FROM sys.dm_os_process_memory; 
+
+
+ 
+SELECT object_name(object_id) AS Name  
+     , *  
+   FROM sys.dm_db_xtp_table_memory_stats  
+ 
+ 
+SELECT total_physical_memory_kb/1024 AS [Physical Memory (MB)], 
+       available_physical_memory_kb/1024 AS [Available Memory (MB)], 
+       total_page_file_kb/1024 AS [Total Page File (MB)], 
+               available_page_file_kb/1024 AS [Available Page File (MB)], 
+               system_cache_kb/1024 AS [System Cache (MB)],
+       system_memory_state_desc AS [System Memory State]
+FROM sys.dm_os_sys_memory WITH (NOLOCK) OPTION (RECOMPILE); 
+ 
+
+WITH AggregateBufferPoolUsage
+AS
+(SELECT DB_NAME(database_id) AS [Database Name],
+CAST(COUNT(*) * 8/1024.0 AS DECIMAL (10,2))  AS [CachedSize]
+FROM sys.dm_os_buffer_descriptors WITH (NOLOCK)
+WHERE database_id <> 32767 -- ResourceDB
+GROUP BY DB_NAME(database_id))
+SELECT ROW_NUMBER() OVER(ORDER BY CachedSize DESC) AS [Buffer Pool Rank], [Database Name], CachedSize AS [Cached Size (MB)],
+       CAST(CachedSize / SUM(CachedSize) OVER() * 100.0 AS DECIMAL(5,2)) AS [Buffer Pool Percent]
+FROM AggregateBufferPoolUsage
+ORDER BY [Buffer Pool Rank] OPTION (RECOMPILE); 
+
