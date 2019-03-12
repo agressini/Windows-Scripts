@@ -1,0 +1,2 @@
+ipconfig /all | find /i "DHCP Server" 
+ 
