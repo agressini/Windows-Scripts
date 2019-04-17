@@ -1,30 +1,56 @@
 param (
     [switch]$ChangeUPN = $false,
-    [switch]$LogDataChange = $false,
     [switch]$DumpData = $false,
-    [string]$path = "",
-    [string]$sb = "", 
+    [string]$Path = "",
+    [string]$Searchbase = "", 
     [string]$NewUPNSufix = ""   
     
 )
-$helpMSGA = ""
+$MSGpath = "Las salidas se redirecionaran a: "
+$helpMSGA = 'La sintaxis del  script requiere los parametros -DumpData -Path y -searchabase. 
+por ejemplo: .\change-upn.ps1 -DumpData -path .\change-upn.ps1 -DumpData -path C:\Scripts -searchbase "OU=Usuarios,DC=labvmw,DC=local"'
 $helpMSGB = ""
+$Path2 = $Path
+$csv = "Name,SamAccountname,OLD_UPN,NEW_UPN`r`n"
 
-if (($DumpData -eq $true) -and ($path -ne "") -and ($sb -ne ""))
+if ((Test-Path -Path $Path))
 {
-    
+    Write-Host $MSGpath $Path
 }
 else
 {
-    $helpMSGA
+    New-Item -ItemType Directory -Force -Path $Path -Verbose | Out-Null
+    Write-Host "Se creo la carpeta "  $Path "las salidas se redirecionaran en esta ruta."
 }
 
-if (($ChangeUPN -eq $true) -and ($path -ne "") -and ($sb -ne ""))
+
+if (($DumpData -eq $true) -and ($Path -ne "") -and ($Searchbase -ne ""))
 {
-    $user = "TECAAJ"
-    $address = Get-ADUser $user -Properties proxyAddresses | Select -Expand proxyAddresses | Where {$_ -clike "SMTP:*"}
-    $address = $address.SubString(5)
-    Set-ADUser $user -UserPrincipalName $address
+    $Path+="\Reporte.csv"
+    Get-ADUser -SearchBase $Searchbase -Filter * -properties *| Select-Object Name,SamAccountName,UserPrincipalName | 
+    Export-Csv -Path $Path -NoTypeInformation
+}
+else
+{
+    Write-Host $helpMSGA
+}
+
+if (($ChangeUPN -eq $true) -and ($path -ne "") -and ($sb -ne "") -and ($NewUPNSufix -ne ""))
+{
+    $Path+="\Reporte.csv"
+    $Path2+="\Reporte_cambio.csv"
+    Get-ADUser -SearchBase $Searchbase -Filter * -properties *| Select-Object Name,SamAccountName,UserPrincipalName | 
+    Export-Csv -Path $Path -NoTypeInformation
+    $users = Import-Csv -Path $Path
+
+    foreach ($user in $users)
+    {
+        $upn = $user.SamAccountName+$NewUPNSufix
+        Set-ADUser $user.SamAccountName   -UserPrincipalName $upn
+        Write-Host "Cambiando el valor de " $user.Name " Nuevo UPN: " $upn
+        $csv = $user.Name + "," + $user.SamAccountName + "," + $user.UserPrincipalName + "," + $upn + "`r`n" 
+        $csv | Out-file -Append -FilePath $Path2
+    }
 }
 else
 {
