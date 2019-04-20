@@ -6,12 +6,25 @@ param (
     [string]$NewUPNSufix = ""   
     
 )
+$mode=0
+$Fname = "\Reporte"+(Get-Date).ToString("ddMMyyyy")+".csv"
+$Fname2 = "\Reporte_cambio_"+(Get-Date).ToString("ddMMyyyy")+".csv"
+
 $MSGpath = "Las salidas se redirecionaran a: "
-$helpMSGA = 'La sintaxis del  script requiere los parametros -DumpData -Path y -searchabase. 
-por ejemplo: .\change-upn.ps1 -DumpData -path .\change-upn.ps1 -DumpData -path C:\Scripts -searchbase "OU=Usuarios,DC=labvmw,DC=local"'
-$helpMSGB = ""
+
+$helpMSG = 'Para exportar los usuarios con la configuracion actual se debe proporcionar parametros:
+-ChangeUPN 
+-Path 
+-Searchabase 
+-NewUPNSufix
+Ej: .\change-upn.ps1 -DumpData -Path C:\Scripts\ -Searchbase "OU=Usuarios,DC=labvmw,DC=local 
+Para realizar el cambio de upn en los usuarios de la OU identificada en el parametro Searchbase se debe proporcionar los parametros:
+-Path
+-DumpData
+-Searchbase
+Ej: .\change-upn.ps1 -ChangeUPN -Path C:\Scripts\ -Searchbase "OU=Usuarios,DC=labvmw,DC=local" -NewUPNSufix "@tecpetrol.com"'
+
 $Path2 = $Path
-$csv = "Name,SamAccountname,OLD_UPN,NEW_UPN`r`n"
 
 if ((Test-Path -Path $Path))
 {
@@ -23,36 +36,36 @@ else
     Write-Host "Se creo la carpeta "  $Path "las salidas se redirecionaran en esta ruta."
 }
 
-
-if (($DumpData -eq $true) -and ($Path -ne "") -and ($Searchbase -ne ""))
+if(($DumpData -eq $true) -and ($Path -ne "") -and ($Searchbase -ne ""))
 {
-    $Path+="\Reporte.csv"
+    $mode =1
+}
+if(($ChangeUPN -eq $true) -and ($path -ne "") -and ($sb -ne "") -and ($NewUPNSufix -ne ""))
+{
+    $mode=2
+}
+if($mode -eq 0){$helpMSG}
+
+
+if (($mode -eq 1) -or ($mode -eq 2))
+{
+    $Path+= $Fname
     Get-ADUser -SearchBase $Searchbase -Filter * -properties *| Select-Object Name,SamAccountName,UserPrincipalName | 
     Export-Csv -Path $Path -NoTypeInformation
 }
-else
-{
-    Write-Host $helpMSGA
-}
 
-if (($ChangeUPN -eq $true) -and ($path -ne "") -and ($sb -ne "") -and ($NewUPNSufix -ne ""))
+if ($mode -eq 2)
 {
-    $Path+="\Reporte.csv"
-    $Path2+="\Reporte_cambio.csv"
-    Get-ADUser -SearchBase $Searchbase -Filter * -properties *| Select-Object Name,SamAccountName,UserPrincipalName | 
-    Export-Csv -Path $Path -NoTypeInformation
+    $Path2+= $fname2
     $users = Import-Csv -Path $Path
-
+    $csv = "Name,SamAccountname,OLD_UPN,NEW_UPN`n" | Out-file -Append -FilePath $Path2
+    
     foreach ($user in $users)
     {
         $upn = $user.SamAccountName+$NewUPNSufix
         Set-ADUser $user.SamAccountName   -UserPrincipalName $upn
         Write-Host "Cambiando el valor de " $user.Name " Nuevo UPN: " $upn
-        $csv = $user.Name + "," + $user.SamAccountName + "," + $user.UserPrincipalName + "," + $upn + "`r`n" 
+        $csv = $user.Name + "," + $user.SamAccountName + "," + $user.UserPrincipalName + "," + $upn + "`n" 
         $csv | Out-file -Append -FilePath $Path2
     }
-}
-else
-{
-    $helpMSGB
 }
