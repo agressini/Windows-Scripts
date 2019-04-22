@@ -10,7 +10,7 @@ $mode=0
 $Fname = "\Reporte"+(Get-Date).ToString("ddMMyyyy")+".csv"
 $Fname2 = "\Reporte_cambio_"+(Get-Date).ToString("ddMMyyyy")+".csv"
 
-$MSGpath = "Las salidas se redirecionaran a: "
+$MSGpath = "Los archivos se guardaran en la ruta: "
 
 $helpMSG = 'Para exportar los usuarios con la configuracion actual se debe proporcionar parametros:
 -ChangeUPN 
@@ -58,14 +58,14 @@ if ($mode -eq 2)
 {
     $Path2+= $fname2
     $users = Import-Csv -Path $Path
-    $csv = "Name,SamAccountname,OLD_UPN,NEW_UPN`n" | Out-file -Append -FilePath $Path2
+    $csv = "Name,SamAccountname,OLD_UPN,NEW_UPN`n" | Out-file -Append -FilePath $Path2 | Out-Null
     
     foreach ($user in $users)
     {
         $upn = $user.SamAccountName+$NewUPNSufix
         Set-ADUser $user.SamAccountName   -UserPrincipalName $upn
         Write-Host "Cambiando el valor de " $user.Name " Nuevo UPN: " $upn
-        $csv = $user.Name + "," + $user.SamAccountName + "," + $user.UserPrincipalName + "," + $upn + "`n" 
+        $csv = $user.Name + "," + $user.SamAccountName + "," + $user.UserPrincipalName + "," + $upn 
         $csv | Out-file -Append -FilePath $Path2
     }
 }
