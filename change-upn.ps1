@@ -17,7 +17,7 @@ $helpMSG = 'Para exportar los usuarios con la configuracion actual se debe propo
 -Path 
 -Searchabase 
 -NewUPNSufix
-Ej: .\change-upn.ps1 -DumpData -Path C:\Scripts\ -Searchbase "OU=Usuarios,DC=labvmw,DC=local 
+Ej: .\change-upn.ps1 -DumpData -Path C:\Scripts\ -Searchbase "OU=Usuarios,DC=labvmw,DC=local" 
 Para realizar el cambio de upn en los usuarios de la OU identificada en el parametro Searchbase se debe proporcionar los parametros:
 -Path
 -DumpData
