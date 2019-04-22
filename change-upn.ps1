@@ -22,7 +22,8 @@ Para realizar el cambio de upn en los usuarios de la OU identificada en el param
 -Path
 -DumpData
 -Searchbase
-Ej: .\change-upn.ps1 -ChangeUPN -Path C:\Scripts\ -Searchbase "OU=Usuarios,DC=labvmw,DC=local" -NewUPNSufix "@tecpetrol.com"'
+Ej: .\change-upn.ps1 -ChangeUPN -Path C:\Scripts\ -Searchbase "OU=Usuarios,DC=labvmw,DC=local" -NewUPNSufix "@tecpetrol.com"
+Este proceso genera una salida del estado previo del usuario referente al UPN'
 
 $Path2 = $Path
 
