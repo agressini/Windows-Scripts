@@ -61,7 +61,6 @@ if ($mode -eq 2)
     
     foreach ($user in $users)
     {
-        #$upn = $user.SamAccountName+$NewUPNSufix
         $upn = $user.EmailAddress
         Set-ADUser $user.SamAccountName   -UserPrincipalName $upn
         Write-Host "Cambiando el valor de " $user.Name " Nuevo UPN: " $upn
