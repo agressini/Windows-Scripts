@@ -36,7 +36,7 @@ ForEach ($Computers in $Computer) {
     }
     else
     {
-        $Computers | Export-CSV $Exportpathold -NoTypeInformation -Append
+        $Computers | Export-CSV $Exportpathdis   -NoTypeInformation -Append
     }
     
 }
