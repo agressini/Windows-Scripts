@@ -1,0 +1,1 @@
+﻿Get-DnsServerZone -Name azurelab.local | Get-DnsServerResourceRecord | select * | where { $_.RecordType -eq "A"} | fl

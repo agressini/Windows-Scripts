@@ -1,1 +1,2 @@
 dsregcmd.exe /status
+dsregcmd.exe /Join

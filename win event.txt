@@ -1,0 +1,22 @@
+
+City                                   : CAPITAL FEDERAL
+Country                                : Argentina
+Department                             : SISTEMAS
+DisplayName                            : OCAMPO Luis
+IsLicensed                             : True
+LastDirSyncTime                        : 7/8/2019 18:04:03
+LastPasswordChangeTimestamp            : 21/7/2019 23:32:48
+Office                                 : SEDE
+State                                  : Buenos Aires
+StreetAddress                          : Della Paolera 299 - Piso 19
+StsRefreshTokensValidFrom              : 21/7/2019 23:32:48
+Title                                  : ADMINISTRADOR REDES
+UsageLocation                          : AR
+UserPrincipalName                      : Luis.OCAMPO@tecpetrol.com
+UserType                               : Member
+ValidationStatus                       : Healthy
+
+Get-MsolUser -UserPrincipalName * | select DisplayName,UserPrincipalName,City,Country,Department,IsLicensed,LastDirSyncTime,LastPasswordChangeTimestamp,Office,State,StreetAddressStsRefreshTokensValidFrom,Title,UsageLocation,serType,ValidationStatus | Export-Csv -Path .\users.csv -notypeinformation -Encoding UTF8
+
+
+Get-WinEvent -Path .\seguridad.evtx  | Where-Object {$_.Id -eq '4723'} | Out-File -FilePath .\eventos4723.csv

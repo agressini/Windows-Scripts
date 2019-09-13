@@ -1,0 +1,2 @@
+﻿Get-ADComputer -Filter * | Measure-Object | Out-File -FilePath $env:USERPROFILE\Desktop\Cantidad_computers.csv
+Get-ADComputer -Filter * | Export-Csv -NoTypeInformation -Path $env:USERPROFILE\Desktop\DomainAdmins.csv
