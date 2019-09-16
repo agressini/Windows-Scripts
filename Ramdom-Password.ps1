@@ -1,1 +1,1 @@
--join ((33..126) | Get-Random -Count 12 | % {[char]$_})
+-join ((33..126) | Get-Random -Count 12 | ForEach-Object {[char]$_})
