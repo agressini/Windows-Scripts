@@ -1,0 +1,14 @@
+ntdsutil
+LDAP policies
+connect to server [Fqdn del servidor]
+q
+show values
+[Capturar Valores iniciales]
+set MaxPageSize to 100000
+set MaxResultSetSize to 1000000
+set MaxTempTableSize to 100000
+
+Commit Changes
+show values
+
+Requiere Reinicio
