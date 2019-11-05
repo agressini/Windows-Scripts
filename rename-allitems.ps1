@@ -1,0 +1,1 @@
+ Get-ChildItem -Path '.\' | ForEach-Object {$_.Name; Rename-Item -Path $_.Name -NewName ($_.Name).TrimStart('Aysa--')}
