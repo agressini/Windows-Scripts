@@ -96,12 +96,22 @@ switch ($Mode) {
                             "Cantidad de Computers (incluye sub OUs): " + ($Computer | Measure-Object).Count | Out-File -Encoding utf8 -FilePath $logPath -Append
                             $Computer | Export-Csv -Path $ReportPath -NoTypeInformation -Append
                         }
+                    }
+                    Catch {
 
+                            "Error: Courrio algun problema conectando" | Out-File -Encoding utf8 -FilePath $logPath -Append
+                            Throw (Write-Warning -Message )
+
+                    }
+
+                    Try{
                         ForEach ($Computers in $Computer) {
 
                             $fqdn = $Computers.Name
-                            Write-Host "conectandose a: $fqdn"
+                            Write-Host "conectandose a: $fqdn" | Out-File -Encoding utf8 -FilePath $logPath -Append
                             $conected = (Test-NetConnection -ComputerName $fqdn -CommonTCPPort WINRM)
+                            "Server: $fqdn TCP TEST " + $conected.TcpTestSucceeded | Out-File -Encoding utf8 -FilePath $logPath -Append
+                            "Server: $fqdn DNS TEST " + $conected.NameResolutionSucceeded | Out-File -Encoding utf8 -FilePath $logPath -Append
 
                             if ($conected.TcpTestSucceeded -eq $true)
                                 {
@@ -109,42 +119,50 @@ switch ($Mode) {
 
                                     if($version -like "5*")
                                         {
-                                            Invoke-Command -ComputerName $Computers.Name -ScriptBlock {Get-LocalGroupMember -Group $Using:Group} |  Select-Object * -ExcludeProperty RunspaceID | Export-CSV $LocalAdminsPath -NoTypeInformation -Append   
+                                            Invoke-Command -ComputerName $Computers.Name -ScriptBlock {Get-LocalGroupMember -Group $Using:Group} |  Select-Object "PSComputerName","Name","PrincipalSource","ObjectClass" | Export-CSV $LocalAdminsPath -NoTypeInformation -Append   
                                         }
+                                        
 
                                     if($version -like "2*" -or $version -like "4*")
                                         {
                                             Invoke-Command -ComputerName $Computers.Name -ScriptBlock {
-                                                            $members = net localgroup administrators | Where-Object {$_ -AND $_ -notmatch "command completed successfully"} | Select-Object -skip 4
-                                                            foreach ($member in $members)
-                                                            {
-                                                                New-Object PSObject -Property @{
-                                                                    Computername = $env:COMPUTERNAME
-                                                                    Group = "Administrators"
-                                                                    Members=$member}|  Select-Object * -ExcludeProperty RunspaceID 
-                                                            }
+                                                $members = net localgroup administrators | Where-Object {$_ -AND $_ -notmatch "command completed successfully"} | Select-Object -skip 4
+                                                $adms = @()
+                                                
+                                                foreach ($member in $members)
+                                                        {
+                                                            $adm = New-Object System.Object
+                                                            $adm | Add-Member -type NoteProperty -name ComputerName -Value $env:COMPUTERNAME
+                                                            $adm | Add-Member -type NoteProperty -name Group -Value "Administrators"
+                                                            $adm | Add-Member -type NoteProperty -name Members -Value $member
+                                                            $adms += $adm
+                                                        }
+                                                        Return $adms
                                                             
-                                             }| Export-CSV $LocalAdminsPaths -NoTypeInformation -Append
+                                             }|Select-Object Computername,Group,Members| Export-CSV $LocalAdminsPaths -NoTypeInformation -Append
                                         }
+
+                                    "Information collected Using Powershell " + $version + " from Server: $fqdn" | Out-File -Encoding utf8 -FilePath $logPath -Append
         
                                 }
                                 else
                                     {
+                                        "Information NOT collected from Server: $fqdn due to connection issues" | Out-File -Encoding utf8 -FilePath $logPath -Append
                                         $Computers | Export-CSV $Noconectionpath -NoTypeInformation -Append
                                     }
                         }
-
-                    }
-                    Catch {
-
-
-                    }
                    
+
+                    }
+                    Catch{
+                            "Error: Courrio algun problema conectando WinRM. Server: $fqdn. Resultado $conected" | Out-File -Encoding utf8 -FilePath $logPath -Append
+                            Throw (Write-Error -Message "No pudimos conectar con un servidor $fqdn. $conected")
+                    }
+
     }
     Default {}
 }
 
 $Now = Get-Date
 Write-Host "closing Log..." -ForegroundColor Yellow
-"Closed Log at " + $env:COMPUTERNAME + " Starting date/time " + $Now | Out-File -Encoding utf8 -FilePath $logPath -Append
-
+"Closed Log at " + $env:COMPUTERNAME + " Ending date/time " + $Now | Out-File -Encoding utf8 -FilePath $logPath -Append
