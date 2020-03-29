@@ -2,10 +2,9 @@
     [string]$pathServers="",
     [string]$OU=""
 )
-$time = Get-Date
-$time = $time.DateTime
-$descriptionA = "Creado el $time - Grupo de administradores de: "
-$descriptionO = "Creado el $time - Grupo de operadores de: "  
+
+$descriptionA = "Creado el " + (Get-Date).DateTime + " - Grupo de administradores de: "
+$descriptionO = "Creado el " + (Get-Date).DateTime + " - Grupo de operadores de: "  
 
 Import-Csv -Path $pathServers -Delimiter ";" | ForEach-Object{
 
