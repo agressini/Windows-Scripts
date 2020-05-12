@@ -76,8 +76,9 @@ Add-Type -TypeDefinition $source
 
 $result = @()
 
-Get-ChildItem $path | Where-Object { ! $_.PSIsContainer} | Foreach-Object { 
+Get-ChildItem $path -Directory  | Foreach-Object { 
   
+    $_.FullName
     $size = [Win32.Disk]::GetSizeOnDisk($_.FullName)
     $obj = New-Object PSObject
     Add-Member -InputObject $obj -MemberType NoteProperty -Name "File Name" -Value $_.Name

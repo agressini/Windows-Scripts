@@ -1,0 +1,1 @@
+net localgroup  "Distributed COM Users" "SANTAFE\Domain Services" /add

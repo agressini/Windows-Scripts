@@ -1,0 +1,1 @@
+Del "%ALLUSERSPROFILE%\Application Data\Microsoft\Network\Downloader\*.*"

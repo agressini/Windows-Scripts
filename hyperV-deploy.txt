@@ -1,0 +1,51 @@
+instalar SO en 6 servers
+Rename NICs
+Rename-NetAdapter -Name "XXX" -NewName "YYY"
+l
+Configurar TEAMS
+Get-NetAdapter  # con este comando identificamos las tarjetas de red para el team
+New-NetLbfoTeam -Name TeamXXX -TeamMembers "Ethernet 2","Ethernet 3" -TeamingMode LACP
+get-Netlbfoteam
+get-Netadapter TeamXXX | get-netipaddress –addressfamily ipv4 | remove-netipaddress
+get-netadapter TeamXXX | New-NetIPAddress -IPAddress '172.16.30.203' -AddressFamily IPv4 -PrefixLength 16 –defaultgateway '172.16.10.254'
+Get-NetAdapter teama | Set-DnsClientServerAddress -ServerAddresses '172.16.30.200','172.16.30.203'
+systeminfo | findstr OS
+PowerShell
+Set-ClusterQuorum -FileShareWitness \\svstore01\Quorum
+1
+Set-ClusterQuorum -FileShareWitness \\svstore01\Quorum
+Configurar herramienta remota
+Enable-PSRemoting
+Enable-WSManCredSSP -Role server
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value "wtroscadahvqa01" #on desktop
+Enable-WSManCredSSP -Role client -DelegateComputer "wtroscadahvqa01" #on desktop
+configurar IP
+ejecutar Sconfig.cmd 
+configurar nombres
+Configurar zona horaria
+Configurar RDP
+instalar actualizaciones en todos los hosts
+instalar hyperV en 1 host de prod y en un host de QA
+Get-WindowsFeature -ComputerName <computer_name>  
+Install-WindowsFeature -Name Hyper-V -ComputerName <computer_name> -IncludeManagementTools -Restart 
+Crear Vswitch
+New-VMSwitch -name ExternalSwitch  -NetAdapterName Ethernet -AllowManagementOS $true
+crear VM con para DC
+Set-VMSwitch -AllowManagementOS $True switch-name
+Get-VMNetworkAdapter -SwitchName switch-name -ManagementOS | Set-VMNetworkAdapterVlan -Access -VlanId VlanID
+mpclaim.exe -r -i -a "" 
+Get-InitiatorPort | Select-Object -Property PortAddress | Format-Table -AutoSize
+
+
+Administrator
+QA1 - WBJDDD75
+Prod1 - 68FHFHC8
+Prod2 - RXSZD7J7
+QA2   - PV7LW2X6
+Prod3 - QYP226G7
+Prod4 - GQFRRSZ6 
+StSg23017825
+
+New-NetIPAddress -InterfaceAlias "Backend" -IPAddress “10.150.1.65” -AddressFamily IPv4 -PrefixLength 26
+remove-netipaddress
+
