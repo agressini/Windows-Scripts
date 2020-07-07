@@ -69,7 +69,7 @@ switch ($Mode) {
                     Write-Host "Report only mode" -ForegroundColor Cyan | Out-File -Encoding utf8 -FilePath $logPath -Append
                     "Report only mode" | Out-File -Encoding utf8 -FilePath $logPath -Append
                     Try {
-                            $Computer = Get-ADComputer -SearchBase $OU -Filter * -Properties Name,IPv4Address,DNSHostName,OperatingSystem,LastLogonDate | Select-Object Name,IPv4Address,DNSHostName,OperatingSystem,LastLogonDate
+                            $Computer = Get-ADComputer -SearchBase $OU -Filter * -Properties Name,IPv4Address,DNSHostName,OperatingSystem,LastLogonDate | Select-Object Name,IPv4Address,DNSHostName,OperatingSystem,LastLogonDate | Where-Object {$_.OperatingSystem -match "Windows*"}
                             Write-Host "Cantidad de Computers (incluye sub OUs): " ($Computer | Measure-Object).Count | Out-File -Encoding utf8 -FilePath $logPath -Append
                             "Cantidad de Computers (incluye sub OUs): " + ($Computer | Measure-Object).Count | Out-File -Encoding utf8 -FilePath $logPath -Append
                             $Computer | Export-Csv -Path $ReportPath -NoTypeInformation -Append
@@ -91,7 +91,7 @@ switch ($Mode) {
                         }
                         Else
                         {
-                            $Computer = Get-ADComputer -SearchBase $OU -Filter * -Properties Name,IPv4Address,DNSHostName,OperatingSystem,LastLogonDate | Select-Object Name,IPv4Address,DNSHostName,OperatingSystem,LastLogonDate
+                            $Computer = Get-ADComputer -SearchBase $OU -Filter * -Properties Name,IPv4Address,DNSHostName,OperatingSystem,LastLogonDate | Select-Object Name,IPv4Address,DNSHostName,OperatingSystem,LastLogonDate | Where-Object {$_.OperatingSystem -match "Windows*"}
                             Write-Host "Cantidad de Computers (incluye sub OUs): " ($Computer | Measure-Object).Count | Out-File -Encoding utf8 -FilePath $logPath -Append
                             "Cantidad de Computers (incluye sub OUs): " + ($Computer | Measure-Object).Count | Out-File -Encoding utf8 -FilePath $logPath -Append
                             $Computer | Export-Csv -Path $ReportPath -NoTypeInformation -Append
